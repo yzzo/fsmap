@@ -1,0 +1,61 @@
+--------------------------------------------------------------------------------
+     fsmap:  Display a file hierarchy in filesystem markup language (FSML)
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+description
+--------------------------------------------------------------------------------
+NAME
+  fsmap - display a file hierarchy in filesystem markup language (FSML)
+
+SYNOPSIS
+  fsmap [path]
+
+DESCRIPTION
+  The fsmap utility recursively descends the directory tree for path and
+  prints a filesystem markup language (FSML) representation of the traversed
+  file hierarchy to standard out.
+
+EXAMPLE
+ Basic usage:
+
+  $ python fsmap.py /tmp/x 
+  <?xml version="1.0"?>
+  <fsml name="/tmp/x" st_ctime="1310203215" st_mtime="1310203215" st_nlink="4" st_gid="1000" st_dev="2049" st_size="4096" st_mode="040755" st_uid="1000" st_atime="1310203234">
+    <dir name="b" st_ctime="1310203229" st_mtime="1310203229" st_nlink="2" st_gid="1000" st_dev="2049" st_size="4096" st_mode="040755" st_uid="1000" st_atime="1310203234">
+      <file name="bb" st_ctime="1310203229" st_mtime="1310203229" st_nlink="1" st_gid="1000" st_dev="2049" st_size="0" st_mode="0100644" st_uid="1000" st_atime="1310203229"/>
+    </dir>
+    <dir  name="a" st_ctime="1310203226" st_mtime="1310203226" st_nlink="2" st_gid="1000" st_dev="2049" st_size="4096" st_mode="040755" st_uid="1000" st_atime="1310203234">
+      <file name="aa" st_ctime="1310203226" st_mtime="1310203226" st_nlink="1" st_gid="1000" st_dev="2049" st_size="0" st_mode="0100644" st_uid="1000" st_atime="1310203226"/>
+    </dir>
+  </fsml>
+
+
+HISTORY
+  A first version of the filesystem markup language appeared as part of the
+  Minerva (http://www.minervahome.net/) project by Steven Goodwin.
+ 
+AUTHOR
+  Alexander Holupirek <alex@holupirek.de>
+
+--------------------------------------------------------------------------------
+license
+--------------------------------------------------------------------------------
+If not explicitly stated otherwise all fsmap(1) code is released under the
+ISC license, i.e., the following terms apply:
+
+/*
+ * Copyright (c) 2011 Alexander Holupirek <alex@holupirek.de>
+ *
+ * Permission to use, copy, modify, and distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */

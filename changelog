@@ -1,0 +1,5 @@
+Version 0.01 (July 9, 2011): 
+
+    fsmap(1) initial version:
+    * displays file hierarchy in FSML
+    * includes stat(2) information as XML attributes
