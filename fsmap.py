@@ -124,19 +124,27 @@ def visit_link(path, depth):
     atts = get_default_atts(path)
     outln(indent(empty_element("link", atts), depth))
 
-def visit_file(path, depth=0):
+def visit_file(path, depth=0, xdcr_map=None):
     '''Regular file is encountered during file hierarchy traversal.
-    path : string, absolute path to regular file 
-    depth: depth of file in file hierarchy'''
+    path    : string, absolute path to regular file 
+    depth   : depth of file in file hierarchy
+    xdcr_map: dict{ suffix : extract callback function } metadata extractors'''
     atts = get_default_atts(path)
     suffix = os.path.splitext(path)[1]
     atts['suffix'] = suffix 
+    if xdcr_map:
+        if suffix in xdcr_map:
+            outln(indent(start_tag("file", atts), depth))
+            xdcr_map[suffix](path, depth + 1) # call transducer's output method
+            outln(indent(end_tag("file"), depth))
+            return
     outln(indent(empty_element("file", atts), depth))
 
-def descend(dpath, depth=0):
+def descend(dpath, depth=0, xdcr_map=None):
     '''Recursively descend into file hierachry.
-    path:  pathname to directory
-    depth: current depth in file hierarchy'''
+    path    :  pathname to directory
+    depth   : current depth in file hierarchy
+    xdcr_map: metadata extractors (pass through to visit_file)'''
     try:
         dents = os.listdir(dpath)
         if depth != 0:
@@ -149,9 +157,9 @@ def descend(dpath, depth=0):
             if os.path.islink(path):
                 visit_link(path, depth + 1)
             elif os.path.isdir(path):
-                descend(path, depth + 1)
+                descend(path, depth + 1, xdcr_map)
             else:
-                visit_file(path, depth + 1)
+                visit_file(path, depth + 1, xdcr_map)
         if depth != 0:
             visit_leave_directory(depth)
 
@@ -163,10 +171,12 @@ def walk(path):
     path    : path to file'''
     abspath = os.path.abspath(path)
     pre_traversal(abspath)
+    xdcr_map = None
+    level = 0
     if (os.path.isdir(abspath)):
-        descend(abspath)
+        descend(abspath, level, xdcr_map)
     else:
-        visit_file(abspath)
+        visit_file(abspath, level + 1, xdcr_map)
     post_traversal()
 
 if __name__ == '__main__':
