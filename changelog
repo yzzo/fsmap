@@ -1,3 +1,28 @@
+Version 0.02 (July 18, 2011): 
+
+    fsmap(1) exiftool version:
+    * [ADD] hook for metadata extractors (aka transducers) plug-ins
+    * [ADD] transducer for 215 file extensions via fabulous exiftool(1)
+            extracts metadata from 
+            .3fr .3g2 .3gp .3gp2 .3gpp .acfm .acr .afm .ai .aif .aifc .aiff .ait
+            .amfm .ape .arw .asf .avi .bmp .btf .ciff .cos .cr2 .crw .cs1 .dc3
+            .dcm .dcp .dcr .dfont .dib .dic .dicm .divx .djv .djvu .dll .dng
+            .doc .docm .docx .dot .dotm .dotx .dv .dvb .dylib .eip .eps .eps2
+            .eps3 .epsf .erf .exe .exif .f4a .f4b .f4p .f4v .fla .flac .flv .fpx
+            .gif .gz .gzip .hdp .htm .html .icc .icm .iiq .ind .indd .indt .itc
+            .jng .jp2 .jpeg .jpg .jpm .jpx .k25 .kdc .key .kth .lnk .m2t .m2ts
+            .m2v .m4a .m4b .m4p .m4v .mef .mie .mif .miff .mka .mks .mkv .mng
+            .mos .mov .mp3 .mp4 .mpc .mpeg .mpg .mpo .mqv .mrw .mts .mxf .nef
+            .newer .nmbtemplate .nrw .numbers .odp .ods .odt .ogg .orf .otf
+            .pages .pbm .pct .pdf .pef .pfa .pfb .pfm .pgf .pgm .pict .pmp .png
+            .pot .potm .potx .ppm .pps .ppsm .ppsx .ppt .pptm .pptx .ps .ps2
+            .ps3 .psb .psd .psp .pspframe .pspimage .pspshape .psptube .qif .qt
+            .qti .qtif .ra .raf .ram .rar .raw .rif .riff .rm .rmvb .rpm .rsrc
+            .rtf .rv .rw2 .rwl .rwz .so .sr2 .srf .srw .svg .swf .thm .thmx .tif
+            .tiff .ts .ttc .ttf .tub .vob .vrd .vsd .wav .wdp .webm .webp .wma
+            .wmv .x3f .xcf .xhtml .xla .xlam .xls .xlsb .xlsm .xlsx .xlt .xltm
+            .xltx .xmp .zip
+
 Version 0.01 (July 9, 2011): 
 
     fsmap(1) initial version:

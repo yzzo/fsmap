@@ -16,27 +16,77 @@ DESCRIPTION
   prints a filesystem markup language (FSML) representation of the traversed
   file hierarchy to standard out.
 
+  If a regular file with a supported file extension is visited fsmap tries to
+  extract file-specific metadata. Currently 215 file extension are supported
+  via exiftool(1).
+
 EXAMPLE
  Basic usage:
 
-  $ python fsmap.py /tmp/x 
+  $ tree ~/Demo/Images/Database/
+  /home/holu/Demo/Images/Database/
+  └── XML
+      └── BaseX.png
+
+      1 directory, 1 file
+
+  $ python fsmap.py ~/Demo/Images/Database/
   <?xml version="1.0"?>
-  <fsml name="/tmp/x" st_ctime="1310203215" st_mtime="1310203215" st_nlink="4" st_gid="1000" st_dev="2049" st_size="4096" st_mode="040755" st_uid="1000" st_atime="1310203234">
-    <dir name="b" st_ctime="1310203229" st_mtime="1310203229" st_nlink="2" st_gid="1000" st_dev="2049" st_size="4096" st_mode="040755" st_uid="1000" st_atime="1310203234">
-      <file name="bb" st_ctime="1310203229" st_mtime="1310203229" st_nlink="1" st_gid="1000" st_dev="2049" st_size="0" st_mode="0100644" st_uid="1000" st_atime="1310203229"/>
-    </dir>
-    <dir  name="a" st_ctime="1310203226" st_mtime="1310203226" st_nlink="2" st_gid="1000" st_dev="2049" st_size="4096" st_mode="040755" st_uid="1000" st_atime="1310203234">
-      <file name="aa" st_ctime="1310203226" st_mtime="1310203226" st_nlink="1" st_gid="1000" st_dev="2049" st_size="0" st_mode="0100644" st_uid="1000" st_atime="1310203226"/>
+  <fsml name="/home/holu/Demo/Images/Database" 
+        st_ctime="1310499391" st_mtime="1310499391" st_nlink="3"
+        st_gid="1000" st_dev="2049" st_size="4096" st_mode="040755"
+        st_uid="1000" st_atime="1310499416">
+    <dir name="XML"
+        st_ctime="1310499403" st_mtime="1310499403" st_nlink="2"
+        st_gid="1000" st_dev="2049" st_size="4096" st_mode="040755"
+        st_uid="1000" st_atime="1310499416">
+      <file name="BaseX.png" suffix=".png"
+        st_ctime="1310499403" st_mtime="1310499403" st_nlink="1"
+        st_gid="1000" st_dev="2049" st_size="76251" st_mode="0100644"
+        st_uid="1000" st_atime="1310499416">
+        <meta xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#r"
+          xmlns:et='http://ns.exiftool.ca/1.0/' et:toolkit='Image::ExifTool 8.60'
+          xmlns:PNG='http://ns.exiftool.ca/PNG/PNG/1.0/'
+          xmlns:Composite='http://ns.exiftool.ca/Composite/1.0/'>
+         <PNG:ImageWidth>1410</PNG:ImageWidth>
+         <PNG:ImageHeight>1033</PNG:ImageHeight>
+         <PNG:BitDepth>8</PNG:BitDepth>
+         <PNG:ColorType>RGB with Alpha</PNG:ColorType>
+         <PNG:Compression>Deflate/Inflate</PNG:Compression>
+         <PNG:Filter>Adaptive</PNG:Filter>
+         <PNG:Interlace>Noninterlaced</PNG:Interlace>
+         <PNG:CreationTime>Mi 19 Jul 2006 09:40:17 +0100</PNG:CreationTime>
+         <PNG:ModifyDate>2007:08:28 16:23:06</PNG:ModifyDate>
+         <PNG:PixelsPerUnitX>23622</PNG:PixelsPerUnitX>
+         <PNG:PixelsPerUnitY>23622</PNG:PixelsPerUnitY>
+         <PNG:PixelUnits>Meters</PNG:PixelUnits>
+         <PNG:Gamma>2.2</PNG:Gamma>
+         <Composite:ImageSize>1410x1033</Composite:ImageSize>
+        </meta>
+      </file>
     </dir>
   </fsml>
-
 
 HISTORY
   A first version of the filesystem markup language appeared as part of the
   Minerva (http://www.minervahome.net/) project by Steven Goodwin.
  
 AUTHOR
-  Alexander Holupirek <alex@holupirek.de>
+  Copyright (c) 2011 Alexander Holupirek <alex@holupirek.de>
+
+  fsmap is free software; you can use it under the terms of the ISC license.
+
+SEE ALSO
+  exiftool(1)
+
+--------------------------------------------------------------------------------
+credits
+--------------------------------------------------------------------------------
+  * Phil Harvey
+    ExifTool: Read, write and edit meta information in a wide variety of files
+    http://www.sno.phy.queensu.ca/~phil/exiftool
+
+  Thank you for a great open source tool!
 
 --------------------------------------------------------------------------------
 license

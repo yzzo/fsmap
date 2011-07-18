@@ -8,6 +8,7 @@ ISC license
 '''
 import sys
 import os
+import transducers
 
 # --- xml formatting and output ------------------------------------------------
 def out(str_):
@@ -26,7 +27,7 @@ def indent(str_, width):
 
 def escape_xml(string):
     '''Escape characters not allowed in attribute values and tag names'''
-    esc = "" 
+    esc = ""
     for char in string:
         if char == '&':
             esc += '&amp;'
@@ -45,15 +46,15 @@ def start_tag(tagname, atts=None):
     tagname: string
     atts   : dict
     '''
-    attributes = "" 
+    attributes = ""
     if atts:
         for name in atts:
             attributes += (" " + name + "=\"" + str(atts[name]) + "\"")
-    return "<{0}{1}>".format(tagname, attributes) 
+    return "<{0}{1}>".format(tagname, attributes)
 
 def end_tag(tagname):
     '''Construct end tag string.'''
-    return "</{0}>".format(tagname) 
+    return "</{0}>".format(tagname)
 
 def empty_element(tagname, atts):
     '''Construct an empty element string.
@@ -67,7 +68,7 @@ def add_stat_attributes(path, atts):
     path: string, absolute path to file
     atts: dictionary to insert'''
     try:
-        stat_ = os.lstat(path) 
+        stat_ = os.lstat(path)
         atts['st_mode']  = oct(stat_.st_mode)
         atts['st_dev']   = str(stat_.st_dev)
         atts['st_nlink'] = str(stat_.st_nlink)
@@ -126,16 +127,19 @@ def visit_link(path, depth):
 
 def visit_file(path, depth=0, xdcr_map=None):
     '''Regular file is encountered during file hierarchy traversal.
-    path    : string, absolute path to regular file 
+    path    : string, absolute path to regular file
     depth   : depth of file in file hierarchy
     xdcr_map: dict{ suffix : extract callback function } metadata extractors'''
     atts = get_default_atts(path)
     suffix = os.path.splitext(path)[1]
-    atts['suffix'] = suffix 
+    atts['suffix'] = str.lower(suffix)
     if xdcr_map:
         if suffix in xdcr_map:
             outln(indent(start_tag("file", atts), depth))
-            xdcr_map[suffix](path, depth + 1) # call transducer's output method
+            metadata = xdcr_map[suffix](path) # call transducer's output method
+            if metadata:
+                for xml in metadata:
+                    out(indent(xml, depth + 1))
             outln(indent(end_tag("file"), depth))
             return
     outln(indent(empty_element("file", atts), depth))
@@ -153,7 +157,7 @@ def descend(dpath, depth=0, xdcr_map=None):
                 return
             visit_enter_directory(dpath, depth)
         for file_ in dents:
-            path = os.path.join(dpath, file_) 
+            path = os.path.join(dpath, file_)
             if os.path.islink(path):
                 visit_link(path, depth + 1)
             elif os.path.isdir(path):
@@ -171,7 +175,7 @@ def walk(path):
     path    : path to file'''
     abspath = os.path.abspath(path)
     pre_traversal(abspath)
-    xdcr_map = None
+    xdcr_map = xdcr_init()
     level = 0
     if (os.path.isdir(abspath)):
         descend(abspath, level, xdcr_map)
@@ -179,8 +183,18 @@ def walk(path):
         visit_file(abspath, level + 1, xdcr_map)
     post_traversal()
 
+# --- transducer initialization ------------------------------------------------
+def xdcr_init():
+    '''Initialize metadata extractors/transducers & populate callback table.'''
+    xdcr_map = {}
+    exiftool = transducers.TransducerExifTool()
+    (exiftool_suffixes, exiftool_extract_func) = exiftool.expose_transducer()
+    for suffix in exiftool_suffixes:
+        xdcr_map[suffix] = exiftool_extract_func
+    return xdcr_map
+
 if __name__ == '__main__':
-    VERSION = .01 
+    VERSION = .02
     if len(sys.argv) != 2:
         raise SystemExit(
             'fsmap(1) - display a file hierarchy in FSML (v%.2f)\n' % VERSION +
