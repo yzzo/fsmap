@@ -1,3 +1,4 @@
+# vim: set fileencoding=utf-8 :
 '''
 transducers.py - metadata extractors (aka transducers) for various filetypes
 
@@ -9,6 +10,50 @@ import atexit
 import sys
 import subprocess
 from subprocess import PIPE
+
+#  Minimal (empty) result (4 lines) --> will not be returned
+#  <content>
+#  <page number="1" position="absolute" top="0" left="0" ...>
+#  </page>
+#  </content>
+def extract_pdftohtml(path):
+    '''Extract text from PDF file.
+    path     : string. absolute path to regular (pdf) file.
+    pagecount: int. number of pages in pdf file.
+    return   : list. extracted text lines wrapped in <page> elements.'''
+    try:
+        pdftext = [ '  <content>\n' ]
+        text = subprocess.check_output( ['pdftohtml', '-nodrm', '-xml'
+            , '-enc', 'UTF-8', '-stdout', path])
+        lines = str(text).splitlines(True)
+        # strip first 4 (header) and last two lines (appendix)
+        del lines[:4]
+        del lines[-2:]
+        has_text = False
+        for line in lines:
+            if line.lstrip().startswith("<text"):
+                has_text = True
+                # substitute common ligatures
+                # www.alanwood.net/unicode/alphabetic_presentation_forms.html
+                line = line.replace("ﬀ ", "ff")   # \uFB00
+                line = line.replace("ﬁ", "fi")    # \uFB01
+                line = line.replace("ﬂ", "fl")    # \uFB02
+                line = line.replace("ﬃ  ", "ffi") # \uFB03
+                line = line.replace("ﬄ  ", "ffl") # \uFB04
+                pdftext.append('      ' + line)
+            else:
+                pdftext.append('    ' + line)
+        pdftext.append('  </content>\n')
+        if has_text:
+            return pdftext
+        else:
+            return []
+
+    except OSError as err:
+        sys.stderr.write('(xdcrexiftool): pdftotext path (' + path + '): '
+            + str(err) + '.\n')
+        sys.exc_clear()
+        return None 
 
 class TransducerExifTool():
     '''
@@ -118,7 +163,7 @@ class TransducerExifTool():
     # - do not return empty meta element, i.e. len(lines) == 4, but []
     # - otherwise delete last line -1 </rdf:RDF> from result
     #   and replace -2 </rdf:Description> with </meta>
-    def extract_exiftool(self, path):
+    def extract_exiftool(self, path, suffix):
         '''Extracts metadata from path and constructs a result list.
         path  : string, absolute path to regular file
         return: list of strings. <meta>...</meta>'''
@@ -140,7 +185,7 @@ class TransducerExifTool():
         self.exiftool.stdin.flush()
 
         line_count = 0
-        lines = [ 
+        lines = [
             '<meta xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#r"\n' ]
         while True:                                      # read from exiftool(1)
             line = self.exiftool.stdout.readline()
@@ -149,10 +194,13 @@ class TransducerExifTool():
             if line_count < 4:                  # skip first lines from exiftool
                 line_count += 1
                 continue
-            lines.append(line)
+            lines.append(' ' + line)
         if len(lines) <= 4:                          # no metadata from exiftool
-#           sys.stderr.write('(xdcrexiftool): No metadata in ' + path + '.\n')
-            return [] 
-        del lines[-1]           # has metadata, remove last element '</rdf:RDF>'
-        lines[-1] = '</meta>\n'        # replace </rdf:Description> with </meta>
+            return []
+        del lines[-2:] # has metadata, remove '</rdf:RDF>', '</rdf:Description>'
+        if suffix == '.pdf':
+            fulltext = extract_pdftohtml(path)
+            if fulltext:
+                lines.extend(fulltext)
+        lines.append('</meta>\n')      # replace </rdf:Description> with </meta>
         return lines

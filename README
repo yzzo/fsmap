@@ -18,7 +18,7 @@ DESCRIPTION
 
   If a regular file with a supported file extension is visited fsmap tries to
   extract file-specific metadata. Currently 215 file extension are supported
-  via exiftool(1).
+  via exiftool(1). PDF content is additionally extracted using pdftohtml(1).
 
 EXAMPLE
  Basic usage:
@@ -77,7 +77,7 @@ AUTHOR
   fsmap is free software; you can use it under the terms of the ISC license.
 
 SEE ALSO
-  exiftool(1)
+  exiftool(1), pdftohtml(1)
 
 --------------------------------------------------------------------------------
 credits
@@ -85,8 +85,10 @@ credits
   * Phil Harvey
     ExifTool: Read, write and edit meta information in a wide variety of files
     http://www.sno.phy.queensu.ca/~phil/exiftool
+  * Gueorgui Ovtcharov, Rainer Dorsch, and the poppler team for pdftohtml
+    http://poppler.freedesktop.org
 
-  Thank you for a great open source tool!
+  Thank you for your great open source tools!
 
 --------------------------------------------------------------------------------
 license

@@ -136,7 +136,7 @@ def visit_file(path, depth=0, xdcr_map=None):
     if xdcr_map:
         if suffix in xdcr_map:
             outln(indent(start_tag("file", atts), depth))
-            metadata = xdcr_map[suffix](path) # call transducer's output method
+            metadata = xdcr_map[suffix](path, suffix) # call xdcr extract method
             if metadata:
                 for xml in metadata:
                     out(indent(xml, depth + 1))
