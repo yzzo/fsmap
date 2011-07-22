@@ -28,7 +28,7 @@ def extract_pdftohtml(path):
         lines = str(text).splitlines(True)
         # strip first 4 (header) and last two lines (appendix)
         del lines[:4]
-        del lines[-2:]
+        del lines[-1:]
         has_text = False
         for line in lines:
             if line.lstrip().startswith("<text"):
