@@ -168,20 +168,20 @@ class TransducerExifTool():
         path  : string, absolute path to regular file
         return: list of strings. <meta>...</meta>'''
 
-        self.exiftool.stdin.write("-b")
-        self.exiftool.stdin.write("\n")
-        self.exiftool.stdin.write("-X")
-        self.exiftool.stdin.write("\n")
-        self.exiftool.stdin.write("--Exiftool:*")
-        self.exiftool.stdin.write("\n")
-        self.exiftool.stdin.write("--File:*")
-        self.exiftool.stdin.write("\n")
-        self.exiftool.stdin.write("--System:*")
-        self.exiftool.stdin.write("\n")
-        self.exiftool.stdin.write(path)
-        self.exiftool.stdin.write("\n")
-        self.exiftool.stdin.write("-execute")
-        self.exiftool.stdin.write("\n")
+        self.exiftool.stdin.write(bytes("-b", 'UTF-8'))
+        self.exiftool.stdin.write(bytes("\n", 'UTF-8'))
+        self.exiftool.stdin.write(bytes("-X", 'UTF-8'))
+        self.exiftool.stdin.write(bytes("\n", 'UTF-8'))
+        self.exiftool.stdin.write(bytes("--Exiftool:*", 'UTF-8'))
+        self.exiftool.stdin.write(bytes("\n", 'UTF-8'))
+        self.exiftool.stdin.write(bytes("--File:*", 'UTF-8'))
+        self.exiftool.stdin.write(bytes("\n", 'UTF-8'))
+        self.exiftool.stdin.write(bytes("--System:*", 'UTF-8'))
+        self.exiftool.stdin.write(bytes("\n", 'UTF-8'))
+        self.exiftool.stdin.write(bytes(path, 'UTF-8'))
+        self.exiftool.stdin.write(bytes("\n", 'UTF-8'))
+        self.exiftool.stdin.write(bytes("-execute", 'UTF-8'))
+        self.exiftool.stdin.write(bytes("\n", 'UTF-8'))
         self.exiftool.stdin.flush()
 
         line_count = 0
@@ -194,7 +194,7 @@ class TransducerExifTool():
             if line_count < 4:                  # skip first lines from exiftool
                 line_count += 1
                 continue
-            lines.append(' ' + line)
+            lines.append(' ' + line.decode('UTF-8'))
         if len(lines) <= 4:                          # no metadata from exiftool
             return []
         del lines[-2:] # has metadata, remove '</rdf:RDF>', '</rdf:Description>'
