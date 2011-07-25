@@ -10,6 +10,47 @@ import atexit
 import sys
 import subprocess
 from subprocess import PIPE
+from lxml import etree
+
+def extract_mail(path, suffix):
+    tree_root = etree.Element("meta")
+    fobj = open(path, "rb")                              #mbox file to read
+    if suffix == "":
+        mbox = etree.SubElement(tree_root, "mbox")
+    if suffix == ".mbs":
+        mbox = etree.SubElement(tree_root, "maildir")
+    for line in fobj:                                   #walk file line by line
+        line.strip()
+        part = line.split()                             #splits line at whitespaces
+        if len(part) > 1:
+            if suffix == "":
+                if part[0] == b'From' and part[1] == b'-':    #new Message begins
+                    msg = etree.SubElement(mbox, "msg")
+            if suffix == ".mbs":
+                if part[0] == b'From':                  #new Message begins
+                    msg = etree.SubElement(mbox, "msg")
+            if part[0] == b'To:':
+                text = ""
+                for x in range(1, len(part)):
+                        text += part[x].decode('cp1252') + " "
+                etree.SubElement(msg, "to").text = text
+            if part[0] == b'From:':
+                text = ""
+                for x in range(1, len(part)):
+                    text += part[x].decode('cp1252') + " "
+                etree.SubElement(msg, "from").text = text
+            if part[0] == b'Subject:':
+                text = ""
+                for x in range(1, len(part)):
+                    text += part[x].decode('cp1252') + " "
+                etree.SubElement(msg, "title").text = text
+            if part[0] == b'Date:':
+                text = ""
+                for x in range(1, len(part)):
+                    text += part[x].decode('cp1252') + " "
+                etree.SubElement(msg, "date").text = text
+    tree = etree.tostringlist(tree_root, pretty_print=True)
+    return tree
 
 #  Minimal (empty) result (4 lines) --> will not be returned
 #  <content>
@@ -168,20 +209,20 @@ class TransducerExifTool():
         path  : string, absolute path to regular file
         return: list of strings. <meta>...</meta>'''
 
-        self.exiftool.stdin.write(bytes("-b", 'UTF-8'))
-        self.exiftool.stdin.write(bytes("\n", 'UTF-8'))
-        self.exiftool.stdin.write(bytes("-X", 'UTF-8'))
-        self.exiftool.stdin.write(bytes("\n", 'UTF-8'))
-        self.exiftool.stdin.write(bytes("--Exiftool:*", 'UTF-8'))
-        self.exiftool.stdin.write(bytes("\n", 'UTF-8'))
-        self.exiftool.stdin.write(bytes("--File:*", 'UTF-8'))
-        self.exiftool.stdin.write(bytes("\n", 'UTF-8'))
-        self.exiftool.stdin.write(bytes("--System:*", 'UTF-8'))
-        self.exiftool.stdin.write(bytes("\n", 'UTF-8'))
-        self.exiftool.stdin.write(bytes(path, 'UTF-8'))
-        self.exiftool.stdin.write(bytes("\n", 'UTF-8'))
-        self.exiftool.stdin.write(bytes("-execute", 'UTF-8'))
-        self.exiftool.stdin.write(bytes("\n", 'UTF-8'))
+        self.exiftool.stdin.write("-b")
+        self.exiftool.stdin.write("\n")
+        self.exiftool.stdin.write("-X")
+        self.exiftool.stdin.write("\n")
+        self.exiftool.stdin.write("--Exiftool:*")
+        self.exiftool.stdin.write("\n")
+        self.exiftool.stdin.write("--File:*")
+        self.exiftool.stdin.write("\n")
+        self.exiftool.stdin.write("--System:*")
+        self.exiftool.stdin.write("\n")
+        self.exiftool.stdin.write(path)
+        self.exiftool.stdin.write("\n")
+        self.exiftool.stdin.write("-execute")
+        self.exiftool.stdin.write("\n")
         self.exiftool.stdin.flush()
 
         line_count = 0
@@ -194,7 +235,7 @@ class TransducerExifTool():
             if line_count < 4:                  # skip first lines from exiftool
                 line_count += 1
                 continue
-            lines.append(' ' + line.decode('UTF-8'))
+            lines.append(' ' + line)
         if len(lines) <= 4:                          # no metadata from exiftool
             return []
         del lines[-2:] # has metadata, remove '</rdf:RDF>', '</rdf:Description>'

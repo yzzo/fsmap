@@ -191,6 +191,8 @@ def xdcr_init():
     (exiftool_suffixes, exiftool_extract_func) = exiftool.expose_transducer()
     for suffix in exiftool_suffixes:
         xdcr_map[suffix] = exiftool_extract_func
+    xdcr_map[''] = transducers.extract_mail
+    xdcr_map['.mbs'] = transducers.extract_mail
     return xdcr_map
 
 if __name__ == '__main__':
