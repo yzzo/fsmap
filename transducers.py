@@ -9,46 +9,30 @@ ISC license
 import atexit
 import sys
 import subprocess
+import mailbox
 from subprocess import PIPE
 from lxml import etree
 
 def extract_mail(path, suffix):
     tree_root = etree.Element("meta")
-    fobj = open(path, "rb")                              #mbox file to read
     if suffix == "":
+        object = mailbox.mbox(path)
         mbox = etree.SubElement(tree_root, "mbox")
-    if suffix == ".mbs":
-        mbox = etree.SubElement(tree_root, "maildir")
-    for line in fobj:                                   #walk file line by line
-        line.strip()
-        part = line.split()                             #splits line at whitespaces
-        if len(part) > 1:
-            if suffix == "":
-                if part[0] == b'From' and part[1] == b'-':    #new Message begins
-                    msg = etree.SubElement(mbox, "msg")
-            if suffix == ".mbs":
-                if part[0] == b'From':                  #new Message begins
-                    msg = etree.SubElement(mbox, "msg")
-            if part[0] == b'To:':
-                text = ""
-                for x in range(1, len(part)):
-                        text += part[x].decode('cp1252') + " "
-                etree.SubElement(msg, "to").text = text
-            if part[0] == b'From:':
-                text = ""
-                for x in range(1, len(part)):
-                    text += part[x].decode('cp1252') + " "
-                etree.SubElement(msg, "from").text = text
-            if part[0] == b'Subject:':
-                text = ""
-                for x in range(1, len(part)):
-                    text += part[x].decode('cp1252') + " "
-                etree.SubElement(msg, "title").text = text
-            if part[0] == b'Date:':
-                text = ""
-                for x in range(1, len(part)):
-                    text += part[x].decode('cp1252') + " "
-                etree.SubElement(msg, "date").text = text
+#    if suffix == ".mbs":
+#        object = mailbox.MaildirMessage(path)
+#        mbox = etree.SubElement(tree_root, "maildir")
+    for message in object:
+        subject = message['subject']
+        sender = message['from']
+        receiver = message['to']
+        date = message['date']
+        text = message['message']
+        msg = etree.SubElement(mbox, "msg")
+        etree.SubElement(msg, "to").text = receiver
+        etree.SubElement(msg, "from").text = sender
+        etree.SubElement(msg, "subject").text = subject
+        etree.SubElement(msg, "date").text = date
+        etree.SubElement(msg, "message").text = text
     tree = etree.tostringlist(tree_root, pretty_print=True)
     return tree
 
